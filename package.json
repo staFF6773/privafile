@@ -23,7 +23,7 @@
   "license": "GPL-3.0-only",
   "devDependencies": {
     "@types/node": "^20.8.0",
-    "electron": "^27.0.0",
+    "electron": "^27.3.11",
     "electron-builder": "^24.13.3",
     "electron-updater": "^6.3.9",
     "typescript": "^5.2.2"

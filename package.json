@@ -1,0 +1,59 @@
+{
+  "name": "privafile",
+  "version": "1.0.0",
+  "description": "A secure file encryption application",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "dev": "npm run build && electron .",
+    "dist": "electron-builder",
+    "deploy": "electron-builder -p always",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/privafile.git"
+  },
+  "author": {
+    "name": "staFF6773",
+    "email": "notstaffof@gmail.com"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.13.3",
+    "electron-updater": "^6.3.9",
+    "typescript": "^5.2.2"
+  },
+  "build": {
+    "appId": "com.privafile.app",
+    "productName": "PrivaFile",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "src/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "deb",
+        "AppImage"
+      ],
+      "category": "Utility",
+      "publish": {
+        "provider": "github",
+        "owner": "staFF6773",
+        "repo": "privafile"
+      }
+    },
+    "publish": {
+      "provider": "github",
+      "releaseType": "release"
+    }
+  }
+}

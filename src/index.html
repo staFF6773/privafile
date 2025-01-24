@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100 dark:bg-gray-900">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivaFile - File Encrypter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"}
+                    }
+                },
+                fontFamily: {
+                    'body': [
+                        'Inter', 
+                        'ui-sans-serif', 
+                        'system-ui', 
+                        '-apple-system', 
+                        'system-ui', 
+                        'Segoe UI', 
+                        'Roboto', 
+                        'Helvetica Neue', 
+                        'Arial', 
+                        'Noto Sans', 
+                        'sans-serif', 
+                        'Apple Color Emoji', 
+                        'Segoe UI Emoji', 
+                        'Segoe UI Symbol', 
+                        'Noto Color Emoji'
+                    ],
+                    'sans': [
+                        'Inter', 
+                        'ui-sans-serif', 
+                        'system-ui', 
+                        '-apple-system', 
+                        'system-ui', 
+                        'Segoe UI', 
+                        'Roboto', 
+                        'Helvetica Neue', 
+                        'Arial', 
+                        'Noto Sans', 
+                        'sans-serif', 
+                        'Apple Color Emoji', 
+                        'Segoe UI Emoji', 
+                        'Segoe UI Symbol', 
+                        'Noto Color Emoji'
+                    ]
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-gray-100 dark:bg-gray-900">
+    <div class="min-h-full flex">
+        <!-- Sidebar -->
+        <div class="hidden md:flex md:flex-shrink-0">
+            <div class="flex flex-col w-64">
+                <div class="flex flex-col h-0 flex-1 bg-gray-800 dark:bg-gray-900">
+                    <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+                        <div class="flex items-center flex-shrink-0 px-4">
+                            <i data-lucide="lock" class="h-8 w-8 text-primary-500"></i>
+                            <h1 class="ml-3 text-2xl font-bold text-white">PrivaFile</h1>
+                        </div>
+                        <nav class="mt-5 flex-1 px-2 space-y-1">
+                            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-white bg-gray-900 dark:bg-gray-800">
+                                <i data-lucide="key" class="mr-3 h-6 w-6 text-primary-500"></i>
+                                Encrypt/Decrypt
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex flex-col w-0 flex-1 overflow-hidden">
+            <main class="flex-1 relative z-0 overflow-y-auto focus:outline-none">
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">File Encryption/Decryption</h1>
+                    </div>
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <div class="py-4">
+                            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                                <div class="px-6 py-8">
+                                    <div class="space-y-8">
+                                        <!-- File Selection -->
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected File</label>
+                                            <div class="flex items-center space-x-4">
+                                                <input type="text" id="selectedFile" readonly class="flex-1 block w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow shadow-sm hover:shadow-md">
+                                                <button onclick="selectFile()" class="inline-flex items-center px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-shadow hover:shadow-md">
+                                                    <i data-lucide="folder" class="mr-2 h-4 w-4"></i>
+                                                    Browse
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Password Input -->
+                                        <div>
+                                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                                            <div class="relative">
+                                                <input type="password" id="password" class="block w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow shadow-sm hover:shadow-md" placeholder="Enter your password">
+                                                <button onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                                                    <i data-lucide="eye" class="h-4 w-4"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="flex justify-center space-x-6">
+                                            <button onclick="encryptFile()" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-transform transform hover:scale-105">
+                                                <i data-lucide="lock" class="mr-2 h-5 w-5"></i>
+                                                Encrypt
+                                            </button>
+                                            <button onclick="decryptFile()" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-transform transform hover:scale-105">
+                                                <i data-lucide="unlock" class="mr-2 h-5 w-5"></i>
+                                                Decrypt
+                                            </button>
+                                        </div>
+
+                                        <!-- Status Message -->
+                                        <div id="status" class="hidden rounded-lg p-4 text-center">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="../dist/renderer.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Function to show status messages
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = type === 'success' 
+                ? 'rounded-lg bg-green-50 dark:bg-green-900 p-4 text-sm text-green-700 dark:text-green-200'
+                : 'rounded-lg bg-red-50 dark:bg-red-900 p-4 text-sm text-red-700 dark:text-red-200';
+            statusDiv.textContent = message;
+            statusDiv.classList.remove('hidden');
+            
+            // Hide the message after 5 seconds
+            setTimeout(() => {
+                statusDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Function to toggle password visibility
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.querySelector('[data-lucide="eye"]');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons(); // Refresh icons
+        }
+
+        // Function to toggle dark mode
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        // Check for saved theme preference or use system preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</body>
+</html>

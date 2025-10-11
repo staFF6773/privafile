@@ -1,139 +1,413 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-100 dark:bg-gray-900">
+<html lang="es" class="h-full bg-[#1e1e1e]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrivaFile - File Encrypter</title>
+    <title>PrivaFile - Secure File Encryption</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"}
-                    }
-                },
-                fontFamily: {
-                    'body': [
-                        'Inter', 
-                        'ui-sans-serif', 
-                        'system-ui', 
-                        '-apple-system', 
-                        'system-ui', 
-                        'Segoe UI', 
-                        'Roboto', 
-                        'Helvetica Neue', 
-                        'Arial', 
-                        'Noto Sans', 
-                        'sans-serif', 
-                        'Apple Color Emoji', 
-                        'Segoe UI Emoji', 
-                        'Segoe UI Symbol', 
-                        'Noto Color Emoji'
-                    ],
-                    'sans': [
-                        'Inter', 
-                        'ui-sans-serif', 
-                        'system-ui', 
-                        '-apple-system', 
-                        'system-ui', 
-                        'Segoe UI', 
-                        'Roboto', 
-                        'Helvetica Neue', 
-                        'Arial', 
-                        'Noto Sans', 
-                        'sans-serif', 
-                        'Apple Color Emoji', 
-                        'Segoe UI Emoji', 
-                        'Segoe UI Symbol', 
-                        'Noto Color Emoji'
-                    ]
-                }
-            }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --editor-bg: #1e1e1e;
+            --sidebar-bg: #252526;
+            --sidebar-width: 200px;
+            --tab-bg: #2d2d2d;
+            --tab-active-bg: #1e1e1e;
+            --border-color: #454545;
+            --text-primary: #d4d4d4;
+            --text-secondary: #858585;
+            --accent-color: #007acc;
+            --button-bg: #0e639c;
+            --button-hover: #1177bb;
+            --input-bg: #3c3c3c;
+            --status-bar-bg: #007acc;
         }
-    </script>
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background-color: var(--editor-bg);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background-color: var(--tab-bg);
+            height: 35px;
+            align-items: center;
+            padding: 0 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 8px 15px;
+            margin-right: 2px;
+            background-color: var(--tab-bg);
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            border-top: 2px solid transparent;
+        }
+        
+        .tab.active {
+            background-color: var(--tab-active-bg);
+            color: white;
+            border-top: 2px solid var(--accent-color);
+        }
+        
+        .tab i {
+            margin-right: 6px;
+        }
+        
+        /* Main Layout */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 15px;
+        }
+        
+        .sidebar-title {
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+            padding: 5px 15px;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+        
+        .sidebar-item {
+            padding: 6px 15px 6px 20px;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(14, 99, 156, 0.2);
+            border-left: 3px solid var(--accent-color);
+        }
+        
+        .sidebar-item i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* Editor Area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--editor-bg);
+            position: relative;
+        }
+        
+        .editor-toolbar {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .editor-title {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .editor-title i {
+            margin-right: 8px;
+            color: var(--accent-color);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 2px;
+            font-size: 13px;
+        }
+        
+        .form-input:focus {
+            outline: 1px solid var(--accent-color);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 2px;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--button-bg);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--button-hover);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .btn i {
+            margin-right: 5px;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            background-color: var(--status-bar-bg);
+            color: white;
+            height: 22px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            justify-content: space-between;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .status-item i {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+        
+        /* Utility Classes */
+        .flex-1 {
+            flex: 1;
+        }
+        
+        .flex {
+            display: flex;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .relative {
+            position: relative;
+        }
+        
+        .absolute {
+            position: absolute;
+        }
+        
+        .right-2 {
+            right: 8px;
+        }
+        
+        .top-1\/2 {
+            top: 50%;
+        }
+        
+        .transform {
+            transform: translateY(-50%);
+        }
+        
+        .text-gray-400 {
+            color: var(--text-secondary);
+        }
+        
+        .hover\:text-white:hover {
+            color: white;
+        }
+        
+        .w-4 {
+            width: 16px;
+        }
+        
+        .h-4 {
+            height: 16px;
+        }
+        
+        .mr-2 {
+            margin-right: 8px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #editor {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+        }
+    </style>
 </head>
-<body class="h-full bg-gray-100 dark:bg-gray-900">
-    <div class="min-h-full flex">
-        <!-- Sidebar -->
-        <div class="hidden md:flex md:flex-shrink-0">
-            <div class="flex flex-col w-64">
-                <div class="flex flex-col h-0 flex-1 bg-gray-800 dark:bg-gray-900">
-                    <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-                        <div class="flex items-center flex-shrink-0 px-4">
-                            <i data-lucide="lock" class="h-8 w-8 text-primary-500"></i>
-                            <h1 class="ml-3 text-2xl font-bold text-white">PrivaFile</h1>
-                        </div>
-                        <nav class="mt-5 flex-1 px-2 space-y-1">
-                            <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-white bg-gray-900 dark:bg-gray-800">
-                                <i data-lucide="key" class="mr-3 h-6 w-6 text-primary-500"></i>
-                                Encrypt/Decrypt
-                            </a>
-                        </nav>
-                    </div>
-                </div>
+<body>
+    <div class="app-container">
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active">
+                <i data-lucide="lock"></i> PrivaFile
+            </div>
+            <div class="tab">
+                <i data-lucide="settings"></i> Settings
             </div>
         </div>
 
-        <!-- Main content -->
-        <div class="flex flex-col w-0 flex-1 overflow-hidden">
-            <main class="flex-1 relative z-0 overflow-y-auto focus:outline-none">
-                <div class="py-6">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">File Encryption/Decryption</h1>
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Actions</div>
+                    <div class="sidebar-item active">
+                        <i data-lucide="lock"></i> Encrypt File
                     </div>
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <div class="py-4">
-                            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                                <div class="px-6 py-8">
-                                    <div class="space-y-8">
-                                        <!-- File Selection -->
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected File</label>
-                                            <div class="flex items-center space-x-4">
-                                                <input type="text" id="selectedFile" readonly class="flex-1 block w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow shadow-sm hover:shadow-md">
-                                                <button onclick="selectFile()" class="inline-flex items-center px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-shadow hover:shadow-md">
-                                                    <i data-lucide="folder" class="mr-2 h-4 w-4"></i>
-                                                    Browse
-                                                </button>
-                                            </div>
-                                        </div>
+                    <div class="sidebar-item">
+                        <i data-lucide="unlock"></i> Decrypt File
+                    </div>
+                </div>
+            </div>
 
-                                        <!-- Password Input -->
-                                        <div>
-                                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
-                                            <div class="relative">
-                                                <input type="password" id="password" class="block w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow shadow-sm hover:shadow-md" placeholder="Enter your password">
-                                                <button onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                                                    <i data-lucide="eye" class="h-4 w-4"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <!-- Actions -->
-                                        <div class="flex justify-center space-x-6">
-                                            <button onclick="encryptFile()" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-transform transform hover:scale-105">
-                                                <i data-lucide="lock" class="mr-2 h-5 w-5"></i>
-                                                Encrypt
-                                            </button>
-                                            <button onclick="decryptFile()" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-transform transform hover:scale-105">
-                                                <i data-lucide="unlock" class="mr-2 h-5 w-5"></i>
-                                                Decrypt
-                                            </button>
-                                        </div>
-
-                                        <!-- Status Message -->
-                                        <div id="status" class="hidden rounded-lg p-4 text-center">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+            <!-- Editor Area -->
+            <div class="editor-area">
+                <div class="editor-toolbar">
+                    <div class="editor-title">
+                        <i data-lucide="file"></i> File Encryption
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select File</label>
+                        <div class="flex" style="gap: 8px;">
+                            <input type="text" id="selectedFile" readonly 
+                                   class="form-input flex-1" 
+                                   placeholder="No file selected">
+                            <button onclick="selectFile()" class="btn btn-outline">
+                                <i data-lucide="folder-open" class="w-4 h-4"></i> Browse
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="relative">
+                            <input type="password" id="password" 
+                                   class="form-input pr-10 w-full" 
+                                   placeholder="Enter your password"
+                                   style="padding-right: 2.5rem;"
+                                   autocomplete="current-password">
+                            <button type="button" 
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 transform p-1 text-gray-400 hover:text-white rounded hover:bg-gray-700 transition-colors flex items-center justify-center h-6 w-6"
+                                    style="top: 50%; transform: translateY(-50%);"
+                                    onclick="togglePasswordVisibility(event)"
+                                    id="togglePasswordIcon"
+                                    title="Show password">
+                                <i data-lucide="eye" class="w-4 h-4 m-auto" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="encryptBtn" class="btn btn-primary">
+                            <i data-lucide="lock" class="w-4 h-4"></i> Encrypt
+                        </button>
+                        <button id="decryptBtn" class="btn btn-outline">
+                            <i data-lucide="unlock" class="w-4 h-4"></i> Decrypt
+                        </button>
+                    </div>
+                    
+                    <!-- Status Message -->
+                    <div id="status" class="mt-4 text-sm hidden">
+                        <div class="flex items-center">
+                            <i data-lucide="info" class="w-4 h-4 mr-2"></i>
+                            <span id="statusText"></span>
                         </div>
                     </div>
                 </div>
-            </main>
+                
+                <!-- Empty editor area -->
+                <div id="editor"></div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="flex items-center">
+                <div class="status-item">
+                    <i data-lucide="git-branch"></i>
+                    <span>main</span>
+                </div>
+                <div class="status-item">
+                    <i data-lucide="shield"></i>
+                    <span>Secure</span>
+                </div>
+            </div>
+            <div>
+                <span id="statusMessage">Ready</span>
+            </div>
         </div>
     </div>
 
@@ -142,45 +416,185 @@
         // Initialize Lucide icons
         lucide.createIcons();
 
+        // Function to switch between tabs
+        function switchTab(tabName) {
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            
+            // Add active class to clicked item
+            if (tabName === 'encrypt') {
+                document.querySelectorAll('.sidebar-item')[0].classList.add('active');
+                document.getElementById('encryptBtn').classList.remove('btn-outline');
+                document.getElementById('encryptBtn').classList.add('btn-primary');
+                document.getElementById('decryptBtn').classList.remove('btn-primary');
+                document.getElementById('decryptBtn').classList.add('btn-outline');
+                showStatus('Select a file to encrypt', 'info');
+            } else if (tabName === 'decrypt') {
+                document.querySelectorAll('.sidebar-item')[1].classList.add('active');
+                document.getElementById('decryptBtn').classList.remove('btn-outline');
+                document.getElementById('decryptBtn').classList.add('btn-primary');
+                document.getElementById('encryptBtn').classList.remove('btn-primary');
+                document.getElementById('encryptBtn').classList.add('btn-outline');
+                showStatus('Select a file to decrypt', 'info');
+            }
+        }
+
         // Function to show status messages
-        function showStatus(message, type) {
+        function showStatus(message, type = 'info') {
             const statusDiv = document.getElementById('status');
-            statusDiv.className = type === 'success' 
-                ? 'rounded-lg bg-green-50 dark:bg-green-900 p-4 text-sm text-green-700 dark:text-green-200'
-                : 'rounded-lg bg-red-50 dark:bg-red-900 p-4 text-sm text-red-700 dark:text-red-200';
-            statusDiv.textContent = message;
+            const statusText = document.getElementById('statusText');
+            const statusMessage = document.getElementById('statusMessage');
+            const icon = document.querySelector('#status i[data-lucide]');
+            
+            // Update status text
+            statusText.textContent = message;
+            statusMessage.textContent = message;
+            
+            // Set status type (info, success, error, warning)
+            let statusClass = 'text-blue-400';
+            let statusIcon = 'info';
+            let statusBarColor = '#007acc';
+            
+            if (type === 'success') {
+                statusClass = 'text-green-400';
+                statusIcon = 'check-circle';
+                statusBarColor = '#2e7d32';
+            } else if (type === 'error') {
+                statusClass = 'text-red-400';
+                statusIcon = 'alert-circle';
+                statusBarColor = '#c62828';
+            } else if (type === 'warning') {
+                statusClass = 'text-yellow-400';
+                statusIcon = 'alert-triangle';
+                statusBarColor = '#f9a825';
+            }
+            
+            // Update status bar
+            document.querySelector('.status-bar').style.backgroundColor = statusBarColor;
+            
+            // Update status element
+            statusDiv.className = `mt-4 text-sm flex items-center ${statusClass}`;
+            
+            // Update icon
+            if (icon) {
+                icon.setAttribute('data-lucide', statusIcon);
+                lucide.createIcons();
+            }
+            
+            // Show status
             statusDiv.classList.remove('hidden');
             
-            // Hide the message after 5 seconds
-            setTimeout(() => {
-                statusDiv.classList.add('hidden');
+            // Auto-hide after delay
+            clearTimeout(window.statusTimeout);
+            window.statusTimeout = setTimeout(() => {
+                statusDiv.classList.add('opacity-0');
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden');
+                    statusDiv.classList.remove('opacity-0');
+                }, 300);
             }, 5000);
         }
 
+        // Initialize everything when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Set initial active tab
+            switchTab('encrypt');
+            
+            // Add event listeners for encrypt/decrypt buttons
+            document.getElementById('encryptBtn').addEventListener('click', () => {
+                const fileInput = document.getElementById('selectedFile');
+                if (!fileInput.value) {
+                    showStatus('Please select a file to encrypt', 'error');
+                    return;
+                }
+                showStatus('Encrypting file...', 'info');
+                // Add your encryption logic here
+            });
+            
+            document.getElementById('decryptBtn').addEventListener('click', () => {
+                const fileInput = document.getElementById('selectedFile');
+                if (!fileInput.value) {
+                    showStatus('Please select a file to decrypt', 'error');
+                    return;
+                }
+                showStatus('Decrypting file...', 'info');
+                // Add your decryption logic here
+            });
+            
+            // Add click handlers for sidebar items
+            document.querySelectorAll('.sidebar-item').forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    switchTab(index === 0 ? 'encrypt' : 'decrypt');
+                });
+            });
+        });
+
         // Function to toggle password visibility
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.querySelector('[data-lucide="eye"]');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.setAttribute('data-lucide', 'eye-off');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.setAttribute('data-lucide', 'eye');
+        function togglePasswordVisibility(event) {
+            // Prevent the default button behavior and stop event propagation
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
             }
-            lucide.createIcons(); // Refresh icons
+            
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.getElementById('togglePasswordIcon');
+            const icon = document.getElementById('passwordToggleIcon');
+            
+            if (!passwordInput || !toggleButton || !icon) {
+                console.error('Could not find required elements');
+                return false;
+            }
+            
+            // Toggle password visibility
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            
+            // Update icon and tooltip
+            const newIcon = isPassword ? 'eye-off' : 'eye';
+            const newTitle = isPassword ? 'Hide password' : 'Show password';
+            
+            // Update the icon
+            icon.setAttribute('data-lucide', newIcon);
+            toggleButton.setAttribute('title', newTitle);
+            
+            // Force re-render of the icon
+            lucide.createIcons();
+            
+            // Focus back on the input for better UX
+            passwordInput.focus();
+            
+            return false;
         }
 
-        // Function to toggle dark mode
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-        }
-
-        // Check for saved theme preference or use system preference
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+        // Function to select file (to be implemented with Electron's dialog)
+        function selectFile() {
+            // This will be implemented in the renderer.js file
+            if (window.electron && window.electron.selectFile) {
+                window.electron.selectFile().then(result => {
+                    if (!result.canceled && result.filePaths.length > 0) {
+                        document.getElementById('selectedFile').value = result.filePaths[0];
+                        showStatus(`Selected file: ${result.filePaths[0]}`, 'info');
+                    }
+                }).catch(err => {
+                    showStatus(`Error selecting file: ${err.message}`, 'error');
+                });
+            } else {
+                // Fallback for browser testing
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        document.getElementById('selectedFile').value = file.name;
+                        showStatus(`Selected file: ${file.name}`, 'info');
+                    }
+                };
+                input.click();
+            }
         }
     </script>
 </body>

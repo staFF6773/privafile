@@ -1,218 +1,208 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-editor-dark">
+<html lang="en" class="h-full">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrivaFile</title>
+    <title>PrivaFile — Secure File Encryption</title>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
-        // Force dark mode by default
-        if (!window.localStorage.theme) {
-            window.localStorage.theme = 'dark';
-            document.documentElement.classList.add('dark');
-        }
-
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        'editor-dark': '#0d1117',
-                        'editor-darker': '#0a0d14',
-                        'editor-light': '#161b22',
-                        'primary': '#58a6ff',
-                        'primary-hover': '#79c0ff',
-                        'text-primary': '#f0f6fc',
-                        'text-secondary': '#8b949e',
-                        'border': '#30363d',
-                        'surface': '#161b22',
-                        'surface-hover': '#1f2937'
+                        'neutral-dark': '#0a0a0a',
+                        'neutral-surface': '#171717',
+                        'neutral-border': '#262626',
+                        'neutral-title': '#fafafa',
+                        'neutral-body': '#a3a3a3',
                     },
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace']
-                    },
-                    spacing: {
-                        18: '4.5rem',
+                        sans: ['Inter', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #a3a3a3;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 10px;
+        }
+    </style>
 </head>
-<body class="h-full bg-editor-darker text-text-primary font-sans antialiased">
-    <div class="min-h-screen flex flex-col">
-        <!-- Top bar -->
-        <div class="h-10 border-b border-border bg-editor-dark flex items-center px-4 justify-between">
-            <div class="flex items-center">
-                <i data-lucide="lock" class="h-4 w-4 text-primary"></i>
-                <h1 class="ml-2 text-sm font-medium text-text-primary">PrivaFile</h1>
-            </div>
-            <div class="flex items-center space-x-2">
-                <span id="status-indicator" class="h-2 w-2 rounded-full bg-green-500"></span>
-                <span class="text-xs text-text-secondary">Ready</span>
-            </div>
-        </div>
 
-        <!-- Main content -->
-        <div class="flex-1 flex">
+<body class="h-full font-sans selection:bg-neutral-title selection:text-neutral-dark overflow-hidden">
+    <div class="h-full flex flex-col">
+        <!-- Top Bar -->
+        <header
+            class="h-12 border-b border-neutral-border bg-neutral-dark flex items-center px-6 justify-between shrink-0">
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center justify-center w-6 h-6 rounded bg-neutral-title">
+                    <i data-lucide="lock" class="w-3.5 h-3.5 text-neutral-dark"></i>
+                </div>
+                <h1 class="text-[11px] font-extrabold uppercase tracking-[0.2em] text-neutral-title">PrivaFile</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></span>
+                    <span class="text-[10px] uppercase tracking-widest font-semibold text-neutral-body">Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
             <!-- Sidebar -->
-            <div class="w-16 border-r border-border bg-editor-dark flex flex-col items-center py-4 space-y-6">
-                <div class="h-px w-6 bg-border my-2"></div>
-                <button class="p-2 rounded-md bg-editor-light text-primary" title="Encrypt/Decrypt">
-                    <i data-lucide="lock" class="h-5 w-5"></i>
+            <nav
+                class="w-16 border-r border-neutral-border bg-neutral-dark flex flex-col items-center py-6 space-y-8 shrink-0">
+                <button
+                    class="flex items-center justify-center w-10 h-10 rounded-lg bg-neutral-surface border border-neutral-border text-neutral-title transition-all hover:border-neutral-body/30"
+                    title="Encrypt/Decrypt">
+                    <i data-lucide="shield" class="w-5 h-5"></i>
                 </button>
-                <button class="p-2 rounded-md hover:bg-editor-light text-text-secondary hover:text-text-primary" title="Settings">
-                    <i data-lucide="settings" class="h-5 w-5"></i>
+                <button
+                    class="flex items-center justify-center w-10 h-10 rounded-lg text-neutral-body transition-all hover:bg-neutral-surface hover:text-neutral-title"
+                    title="Archive">
+                    <i data-lucide="box" class="w-5 h-5"></i>
                 </button>
-            </div>
+                <div class="mt-auto flex flex-col items-center space-y-6">
+                    <button class="text-neutral-body hover:text-neutral-title transition-colors" title="Settings">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </nav>
 
-            <!-- Main content area -->
-            <div class="flex-1 flex flex-col items-center justify-center p-8 overflow-auto">
-                <div class="w-full max-w-2xl bg-editor-dark border border-border p-8 rounded-lg">
-                    <div class="text-center mb-8">
-                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-editor-light mb-4">
-                            <i data-lucide="lock" class="h-8 w-8 text-primary"></i>
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-auto custom-scrollbar bg-neutral-dark flex items-center justify-center p-12">
+                <div class="w-full max-w-lg">
+                    <div class="mb-12 text-center">
+                        <h2 class="text-3xl font-bold tracking-tight text-neutral-title mb-4">Secure Encryption</h2>
+                        <p class="text-sm text-neutral-body leading-relaxed max-w-sm mx-auto">
+                            Local-first tool for professional file protection. No data ever leaves your device.
+                        </p>
+                    </div>
+
+                    <div class="bg-neutral-surface border border-neutral-border rounded-xl p-10 space-y-10 shadow-2xl">
+                        <!-- File Selection Section -->
+                        <div class="space-y-3">
+                            <label
+                                class="text-[10px] uppercase tracking-[0.15em] font-bold text-neutral-body block">Target
+                                File</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="selectedFile" readonly
+                                    class="flex-1 bg-neutral-dark border border-neutral-border rounded-lg px-4 py-3 text-xs text-neutral-body focus:outline-none placeholder:text-neutral-body/30"
+                                    placeholder="No source selected...">
+                                <button onclick="selectFile()"
+                                    class="bg-neutral-border hover:bg-neutral-body/20 text-neutral-title px-6 py-3 rounded-lg text-[10px] uppercase font-bold tracking-widest transition-all">
+                                    Browse
+                                </button>
+                            </div>
                         </div>
-                        <h2 class="text-xl font-medium text-text-primary mb-2">Secure File Encryption</h2>
-                        <p class="text-sm text-text-secondary max-w-md mx-auto">Protect your files with strong encryption. Simply select a file, set a password, and click Encrypt or Decrypt.</p>
-                    </div>
-                <!-- File Selection -->
-                <div class="mb-6">
-                    <div class="flex items-center mb-1">
-                        <label class="text-xs font-mono text-text-secondary uppercase tracking-wider">File</label>
-                    </div>
-                    <div class="flex space-x-2">
-                        <input 
-                            type="text" 
-                            id="selectedFile" 
-                            readonly 
-                            class="flex-1 w-full px-3 py-2 text-sm bg-editor-light border border-border text-text-primary font-mono placeholder-text-secondary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
-                            placeholder="No file selected"
-                        >
-                        <button 
-                            onclick="selectFile()" 
-                            class="inline-flex items-center px-3 py-2 text-xs bg-editor-light border border-border text-text-primary hover:bg-surface hover:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary"
-                        >
-                            <i data-lucide="folder" class="h-3.5 w-3.5 mr-1.5"></i>
-                            Browse
-                        </button>
-                    </div>
-                </div>
 
-                <!-- Password Input -->
-                <div class="mb-8">
-                    <div class="flex items-center justify-between mb-1">
-                        <label class="text-xs font-mono text-text-secondary uppercase tracking-wider">Password</label>
-                        <button 
-                            onclick="togglePasswordVisibility()" 
-                            class="text-xs text-text-secondary hover:text-primary flex items-center"
-                        >
-                            <i data-lucide="eye" class="h-3.5 w-3.5 mr-1"></i>
-                            Show
-                        </button>
+                        <!-- Password Input Section -->
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <label
+                                    class="text-[10px] uppercase tracking-[0.15em] font-bold text-neutral-body">Passphrase</label>
+                                <button onclick="togglePasswordVisibility()"
+                                    class="text-[10px] uppercase tracking-widest font-bold text-neutral-body hover:text-neutral-title flex items-center transition-colors">
+                                    <i data-lucide="eye" class="w-3 h-3 mr-1.5 pt-0.5"></i>
+                                    Show
+                                </button>
+                            </div>
+                            <input type="password" id="password"
+                                class="w-full bg-neutral-dark border border-neutral-border rounded-lg px-4 py-3 text-sm text-neutral-title focus:border-neutral-body/50 transition-colors focus:outline-none placeholder:text-neutral-body/20"
+                                placeholder="••••••••••••••••">
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-4 pt-4">
+                            <button onclick="encryptFile()"
+                                class="flex-1 bg-neutral-title text-neutral-dark py-4 rounded-lg text-[11px] uppercase font-black tracking-[0.2em] hover:opacity-90 transition-all active:scale-[0.98]">
+                                Encrypt
+                            </button>
+                            <button onclick="decryptFile()"
+                                class="flex-1 border border-neutral-border text-neutral-title py-4 rounded-lg text-[11px] uppercase font-black tracking-[0.2em] bg-neutral-surface hover:bg-neutral-border/30 transition-all active:scale-[0.98]">
+                                Decrypt
+                            </button>
+                        </div>
                     </div>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        class="block w-full px-3 py-2 text-sm bg-editor-light border border-border text-text-primary font-mono focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent" 
-                        placeholder="················"
-                    >
-                </div>
 
-                <!-- Actions -->
-                <div class="flex space-x-3">
-                    <button 
-                        onclick="encryptFile()" 
-                        class="flex-1 flex items-center justify-center px-4 py-2.5 text-sm font-medium bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 focus:outline-none focus:ring-1 focus:ring-primary/50"
-                    >
-                        <i data-lucide="lock" class="h-3.5 w-3.5 mr-2"></i>
-                        Encrypt
-                    </button>
-                    <button 
-                        onclick="decryptFile()" 
-                        class="flex-1 flex items-center justify-center px-4 py-2.5 text-sm font-medium border border-border text-text-primary bg-editor-light hover:bg-surface hover:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary/50"
-                    >
-                        <i data-lucide="unlock" class="h-3.5 w-3.5 mr-2"></i>
-                        Decrypt
-                    </button>
-                </div>
-
-                    <!-- Status Message -->
-                    <div id="status" class="mt-6 p-3 text-sm text-center font-mono text-text-secondary bg-editor-light rounded border border-border">
-                        <div class="flex items-center justify-center space-x-2">
-                            <i data-lucide="info" class="h-3.5 w-3.5"></i>
-                            <span>Ready to encrypt or decrypt files</span>
+                    <!-- System Status Tooltip-style info -->
+                    <div id="status" class="mt-10 flex flex-col items-center justify-center space-y-4">
+                        <div
+                            class="inline-flex items-center space-x-3 px-4 py-2 rounded-full border border-neutral-border bg-neutral-surface text-[10px] font-medium tracking-tight">
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-neutral-body"></i>
+                            <p class="text-neutral-body">Ready to process requests</p>
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
 
-        <!-- Status Bar -->
-        <div class="h-6 border-t border-border bg-editor-dark flex items-center px-4 justify-between text-xs text-text-secondary">
+        <!-- Footnote Status Bar -->
+        <footer
+            class="h-8 border-t border-neutral-border bg-neutral-dark flex items-center px-6 justify-between text-[10px] text-neutral-body shrink-0 font-medium tracking-tight">
             <div class="flex items-center space-x-4">
-                <span>PrivaFile v1.0.0</span>
-                <span class="hidden md:inline">•</span>
-                <span class="hidden md:inline">Secure File Encryption</span>
+                <span class="uppercase tracking-widest">PrivaFile v1.1.0</span>
+                <span class="opacity-30">|</span>
+                <span id="file-info" class="truncate max-w-[200px]">No document loaded</span>
             </div>
-            <div class="flex items-center space-x-4">
-                <span id="file-info">No file selected</span>
-                <span>•</span>
+            <div class="flex items-center space-x-6">
+                <span>LOCAL-FIRST ENCRYPTION</span>
                 <span id="encryption-status" class="flex items-center">
-                    <span class="h-2 w-2 rounded-full bg-green-500 mr-1.5"></span>
-                    <span>Secure</span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500 mr-2"></span>
+                    <span class="text-neutral-title uppercase tracking-tighter">SECURE</span>
                 </span>
             </div>
-        </div>
+        </footer>
     </div>
 
+    <!-- Scripts -->
     <script src="../dist/renderer.js"></script>
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
 
-        // Function to show status messages
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('status');
-            statusDiv.className = type === 'success' 
-                ? 'rounded-lg bg-green-50 dark:bg-green-900 p-4 text-sm text-green-700 dark:text-green-200'
-                : 'rounded-lg bg-red-50 dark:bg-red-900 p-4 text-sm text-red-700 dark:text-red-200';
-            statusDiv.textContent = message;
-            statusDiv.classList.remove('hidden');
-            
-            // Hide the message after 5 seconds
-            setTimeout(() => {
-                statusDiv.classList.add('hidden');
-            }, 5000);
-        }
-
-        // Function to toggle password visibility
+        // Password visibility toggle helper
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
-            const eyeIcon = document.querySelector('[data-lucide="eye"]');
+            const eyeBtn = document.querySelector('[onclick="togglePasswordVisibility()"]');
+            const eyeIcon = eyeBtn.querySelector('i');
+            const textNode = eyeBtn.lastChild;
+
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 eyeIcon.setAttribute('data-lucide', 'eye-off');
+                textNode.textContent = ' Hide';
             } else {
                 passwordInput.type = 'password';
                 eyeIcon.setAttribute('data-lucide', 'eye');
+                textNode.textContent = ' Show';
             }
-            lucide.createIcons(); // Refresh icons
-        }
-
-        // Function to toggle dark mode
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-        }
-
-        // Check for saved theme preference or use system preference
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+            lucide.createIcons();
         }
     </script>
 </body>
+
 </html>

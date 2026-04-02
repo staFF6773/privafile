@@ -97,42 +97,34 @@ function showStatus(message: string, success: boolean) {
     if (!statusElement) return;
     
     const icon = success ? 'check-circle' : 'alert-circle';
-    const iconColor = success ? 'text-green-500' : 'text-red-500';
+    const iconColor = success ? 'text-neutral-title' : 'text-red-500';
     
-    // Update the status message
-    const messageElement = statusElement.querySelector('span');
+    // Update the status message (in the <p> tag)
+    const messageElement = statusElement.querySelector('p');
     if (messageElement) {
         messageElement.textContent = message;
     }
     
-    // Update the icon
+    // Update the icon container and icon
     const iconElement = statusElement.querySelector('i');
     if (iconElement) {
         iconElement.setAttribute('data-lucide', icon);
-        // Remove all classes and add the base classes
-        iconElement.className = 'h-3.5 w-3.5';
-        iconElement.classList.add(iconColor);
+        iconElement.className = `w-3.5 h-3.5 ${iconColor}`;
     }
     
     // Re-initialize Lucide icons
     lucide.createIcons();
     
-    // Make sure the status is visible
-    statusElement.classList.remove('hidden');
-    
-    // Auto-hide after 5 seconds
+    // Auto-hide after 5 seconds (reset to default)
     setTimeout(() => {
-        // Reset to default state after hiding
-        setTimeout(() => {
-            if (statusElement && messageElement) {
-                messageElement.textContent = 'Ready to encrypt or decrypt files';
-                if (iconElement) {
-                    iconElement.setAttribute('data-lucide', 'info');
-                    iconElement.className = 'h-3.5 w-3.5 text-text-secondary';
-                    lucide.createIcons();
-                }
+        if (statusElement && messageElement) {
+            messageElement.textContent = 'Ready to process requests';
+            if (iconElement) {
+                iconElement.setAttribute('data-lucide', 'info');
+                iconElement.className = 'w-3.5 h-3.5 text-neutral-body';
+                lucide.createIcons();
             }
-        }, 300);
+        }
     }, 5000);
 }
 

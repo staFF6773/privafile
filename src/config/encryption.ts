@@ -2,55 +2,60 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 
-const SALT_LENGTH = 16; // Salt length in bytes
-const KEY_LENGTH = 32; // Key length in bytes (256 bits)
-const IV_LENGTH = 12; // IV length in bytes for GCM (96 bits)
-const ITERATIONS = 100000; // Number of iterations for PBKDF2
-const AUTH_TAG_LENGTH = 16; // Authentication tag length in bytes (128 bits)
+const SALT_LENGTH = 16;
+const KEY_LENGTH = 32;
+const ITERATIONS = 100000;
+const AUTH_TAG_LENGTH = 16;
 
-/**
- * Encrypts a file using AES-256-GCM.
- * @param filePath Path of the file to encrypt.
- * @param password Password to derive the encryption key.
- * @returns Object with the result of the operation.
- */
-export function encryptFile(filePath: string, password: string): { success: boolean; path?: string; error?: string } {
+const ALGORITHMS: Record<string, { id: number; name: string; ivLength: number }> = {
+  'aes-256-gcm': { id: 0x01, name: 'aes-256-gcm', ivLength: 12 },
+  'aes-256-cbc': { id: 0x02, name: 'aes-256-cbc', ivLength: 16 }
+};
+
+export function encryptFile(filePath: string, password: string, algorithmName: string = 'aes-256-gcm'): { success: boolean; path?: string; error?: string } {
   try {
-    // Check if the file is already encrypted
+    const algo = ALGORITHMS[algorithmName] || ALGORITHMS['aes-256-gcm'];
+    
     if (filePath.endsWith('.encrypted')) {
       return { success: false, error: 'The file is already encrypted.' };
     }
 
-    // Read the file content
     const fileContent = fs.readFileSync(filePath);
-
-    // Generate a random salt and IV
     const salt = crypto.randomBytes(SALT_LENGTH);
-    const iv = crypto.randomBytes(IV_LENGTH);
-
-    // Derive the key using PBKDF2
+    const iv = crypto.randomBytes(algo.ivLength);
     const key = crypto.pbkdf2Sync(password, salt, ITERATIONS, KEY_LENGTH, 'sha256');
 
-    // Create the cipher
-    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    let cipher: any;
+    let authTag: Buffer | null = null;
 
-    // Encrypt the content
+    if (algo.name.includes('gcm')) {
+      // @ts-ignore
+      cipher = crypto.createCipheriv(algo.name, key, iv, { authTagLength: AUTH_TAG_LENGTH });
+    } else {
+      cipher = crypto.createCipheriv(algo.name, key, iv);
+    }
+
     const encryptedContent = Buffer.concat([
       cipher.update(fileContent),
       cipher.final(),
     ]);
 
-    // Get the authentication tag
-    const authTag = cipher.getAuthTag();
+    if (algo.name.includes('gcm')) {
+      authTag = cipher.getAuthTag();
+    }
 
-    // Final format: salt (16 bytes) + iv (12 bytes) + authTag (16 bytes) + encrypted content
-    const finalBuffer = Buffer.concat([salt, iv, authTag, encryptedContent]);
+    // Header: [1 byte AlgorithmID] [16 bytes Salt] [IV_LENGTH bytes IV] [16 bytes AuthTag (if GCM)]
+    const headerId = Buffer.alloc(1);
+    headerId.writeUInt8(algo.id, 0);
 
-    // Rename the original file by appending .encrypted
+    const buffers = [headerId, salt, iv] as any[];
+    if (authTag) buffers.push(authTag);
+    buffers.push(encryptedContent);
+
+    const finalBuffer = Buffer.concat(buffers);
+
     const newPath = filePath + '.encrypted';
     fs.renameSync(filePath, newPath);
-
-    // Write the encrypted content to the new file
     fs.writeFileSync(newPath, finalBuffer);
 
     return { success: true, path: newPath };
@@ -60,48 +65,50 @@ export function encryptFile(filePath: string, password: string): { success: bool
   }
 }
 
-/**
- * Decrypts a file encrypted with AES-256-GCM.
- * @param filePath Path of the encrypted file.
- * @param password Password to derive the decryption key.
- * @returns Object with the result of the operation.
- */
 export function decryptFile(filePath: string, password: string): { success: boolean; path?: string; error?: string } {
   try {
-    // Check if the file is encrypted
     if (!filePath.endsWith('.encrypted')) {
       return { success: false, error: 'The file is not encrypted.' };
     }
 
-    // Read the encrypted data
     const encryptedData = fs.readFileSync(filePath);
 
-    // Extract the salt, IV, auth tag, and encrypted content
-    const salt = encryptedData.slice(0, SALT_LENGTH);
-    const iv = encryptedData.slice(SALT_LENGTH, SALT_LENGTH + IV_LENGTH);
-    const authTag = encryptedData.slice(SALT_LENGTH + IV_LENGTH, SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH);
-    const encryptedContent = encryptedData.slice(SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH);
+    // Read Algorithm ID (first byte)
+    const algoId = encryptedData.readUInt8(0);
+    const algoName = Object.keys(ALGORITHMS).find(key => ALGORITHMS[key].id === algoId);
+    if (!algoName) return { success: false, error: 'Unsupported or corrupted encryption format.' };
+    
+    const algo = ALGORITHMS[algoName];
 
-    // Derive the key using the same salt
+    let offset = 1;
+    const salt = encryptedData.slice(offset, offset + SALT_LENGTH);
+    offset += SALT_LENGTH;
+    const iv = encryptedData.slice(offset, offset + algo.ivLength);
+    offset += algo.ivLength;
+
+    let authTag: Buffer | null = null;
+    if (algo.name.includes('gcm')) {
+      authTag = encryptedData.slice(offset, offset + AUTH_TAG_LENGTH);
+      offset += AUTH_TAG_LENGTH;
+    }
+
+    const encryptedContent = encryptedData.slice(offset);
     const key = crypto.pbkdf2Sync(password, salt, ITERATIONS, KEY_LENGTH, 'sha256');
 
-    // Create the decipher
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag); // Set the authentication tag
+    // @ts-ignore
+    const decipher = crypto.createDecipheriv(algo.name, key, iv, algo.name.includes('gcm') ? { authTagLength: AUTH_TAG_LENGTH } : undefined);
+    
+    if (authTag) {
+      (decipher as crypto.DecipherGCM).setAuthTag(authTag);
+    }
 
-    // Decrypt the content
     const decryptedContent = Buffer.concat([
       decipher.update(encryptedContent),
       decipher.final(),
     ]);
 
-    // Get the original path (without .encrypted)
     const originalPath = filePath.slice(0, -'.encrypted'.length);
-
-    // Write the decrypted content to the original file
     fs.writeFileSync(originalPath, decryptedContent);
-
-    // Delete the encrypted file
     fs.unlinkSync(filePath);
 
     return { success: true, path: originalPath };

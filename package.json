@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "start": "electron .",
-    "build": "tsc",
+    "build": "tsc && cp -r src/locales dist/",
     "watch": "tsc -w",
     "dev": "npm run build && electron .",
     "dist": "electron-builder",
@@ -20,7 +20,7 @@
     "name": "staFF6773",
     "email": "notstaffof@gmail.com"
   },
-  "license": "ISC",
+  "license": "GPL-3.0-only",
   "devDependencies": {
     "@types/node": "^24.0.0",
     "electron": "^41.0.0",

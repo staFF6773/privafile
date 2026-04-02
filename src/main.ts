@@ -1,5 +1,5 @@
 // main.ts
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron';
 import * as path from 'path';
 import { encryptFile, decryptFile } from './config/encryption';
 import { autoUpdater } from 'electron-updater';
@@ -87,11 +87,16 @@ ipcMain.handle('select-file', async () => {
 });
 
 // Handler to encrypt a file
-ipcMain.handle('encrypt-file', async (event, filePath: string, password: string) => {
-  return encryptFile(filePath, password);
+ipcMain.handle('encrypt-file', async (event, filePath: string, password: string, algorithm: string) => {
+  return encryptFile(filePath, password, algorithm);
 });
 
 // Handler to decrypt a file
 ipcMain.handle('decrypt-file', async (event, filePath: string, password: string) => {
   return decryptFile(filePath, password);
+});
+
+// Handler to locate a file in folder
+ipcMain.handle('locate-file', async (event, filePath: string) => {
+  shell.showItemInFolder(filePath);
 });

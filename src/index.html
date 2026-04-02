@@ -76,28 +76,37 @@
             <nav
                 class="w-16 border-r border-neutral-border bg-neutral-dark flex flex-col items-center py-6 space-y-8 shrink-0">
                 <button
+                    id="btn-encrypt"
+                    onclick="switchView('encrypt')"
                     class="flex items-center justify-center w-10 h-10 rounded-lg bg-neutral-surface border border-neutral-border text-neutral-title transition-all hover:border-neutral-body/30"
                     title="Encrypt/Decrypt">
                     <i data-lucide="shield" class="w-5 h-5"></i>
                 </button>
                 <button
+                    id="btn-archive"
+                    onclick="switchView('archive')"
                     class="flex items-center justify-center w-10 h-10 rounded-lg text-neutral-body transition-all hover:bg-neutral-surface hover:text-neutral-title"
                     title="Archive">
                     <i data-lucide="box" class="w-5 h-5"></i>
                 </button>
                 <div class="mt-auto flex flex-col items-center space-y-6">
-                    <button class="text-neutral-body hover:text-neutral-title transition-colors" title="Settings">
+                    <button 
+                        id="btn-settings"
+                        onclick="switchView('settings')"
+                        class="text-neutral-body hover:text-neutral-title transition-colors" title="Settings">
                         <i data-lucide="settings" class="w-4 h-4"></i>
                     </button>
                 </div>
             </nav>
 
             <!-- Main Content Area -->
-            <main class="flex-1 overflow-auto custom-scrollbar bg-neutral-dark flex items-center justify-center p-12">
-                <div class="w-full max-w-lg">
+            <main class="flex-1 overflow-auto custom-scrollbar bg-neutral-dark flex items-center justify-center p-12 relative">
+                
+                <!-- Encrypt/Decrypt View -->
+                <div id="view-encrypt" class="w-full max-w-lg transition-all duration-300">
                     <div class="mb-12 text-center">
-                        <h2 class="text-3xl font-bold tracking-tight text-neutral-title mb-4">Secure Encryption</h2>
-                        <p class="text-sm text-neutral-body leading-relaxed max-w-sm mx-auto">
+                        <h2 data-i18n="encrypt_title" class="text-3xl font-bold tracking-tight text-neutral-title mb-4">Secure Encryption</h2>
+                        <p data-i18n="encrypt_desc" class="text-sm text-neutral-body leading-relaxed max-w-sm mx-auto">
                             Local-first tool for professional file protection. No data ever leaves your device.
                         </p>
                     </div>
@@ -105,15 +114,15 @@
                     <div class="bg-neutral-surface border border-neutral-border rounded-xl p-10 space-y-10 shadow-2xl">
                         <!-- File Selection Section -->
                         <div class="space-y-3">
-                            <label
+                            <label data-i18n="label_file"
                                 class="text-[10px] uppercase tracking-[0.15em] font-bold text-neutral-body block">Target
                                 File</label>
                             <div class="flex gap-2">
                                 <input type="text" id="selectedFile" readonly
                                     class="flex-1 bg-neutral-dark border border-neutral-border rounded-lg px-4 py-3 text-xs text-neutral-body focus:outline-none placeholder:text-neutral-body/30"
                                     placeholder="No source selected...">
-                                <button onclick="selectFile()"
-                                    class="bg-neutral-border hover:bg-neutral-body/20 text-neutral-title px-6 py-3 rounded-lg text-[10px] uppercase font-bold tracking-widest transition-all">
+                                <button onclick="selectFile()" data-i18n="btn_browse"
+                                    class="bg-neutral-border hover:bg-neutral-body/20 text-neutral-title px-6 py-3 rounded-lg text-[10px] uppercase font-bold tracking-widest transition-all text-nowrap">
                                     Browse
                                 </button>
                             </div>
@@ -122,12 +131,12 @@
                         <!-- Password Input Section -->
                         <div class="space-y-3">
                             <div class="flex justify-between items-center">
-                                <label
+                                <label data-i18n="label_pass"
                                     class="text-[10px] uppercase tracking-[0.15em] font-bold text-neutral-body">Passphrase</label>
                                 <button onclick="togglePasswordVisibility()"
                                     class="text-[10px] uppercase tracking-widest font-bold text-neutral-body hover:text-neutral-title flex items-center transition-colors">
                                     <i data-lucide="eye" class="w-3 h-3 mr-1.5 pt-0.5"></i>
-                                    Show
+                                    <span data-i18n="btn_show">Show</span>
                                 </button>
                             </div>
                             <input type="password" id="password"
@@ -137,11 +146,11 @@
 
                         <!-- Action Buttons -->
                         <div class="flex gap-4 pt-4">
-                            <button onclick="encryptFile()"
+                            <button onclick="encryptFile()" data-i18n="btn_encrypt"
                                 class="flex-1 bg-neutral-title text-neutral-dark py-4 rounded-lg text-[11px] uppercase font-black tracking-[0.2em] hover:opacity-90 transition-all active:scale-[0.98]">
                                 Encrypt
                             </button>
-                            <button onclick="decryptFile()"
+                            <button onclick="decryptFile()" data-i18n="btn_decrypt"
                                 class="flex-1 border border-neutral-border text-neutral-title py-4 rounded-lg text-[11px] uppercase font-black tracking-[0.2em] bg-neutral-surface hover:bg-neutral-border/30 transition-all active:scale-[0.98]">
                                 Decrypt
                             </button>
@@ -153,10 +162,78 @@
                         <div
                             class="inline-flex items-center space-x-3 px-4 py-2 rounded-full border border-neutral-border bg-neutral-surface text-[10px] font-medium tracking-tight">
                             <i data-lucide="info" class="w-3.5 h-3.5 text-neutral-body"></i>
-                            <p class="text-neutral-body">Ready to process requests</p>
+                            <p data-i18n="status_ready" class="text-neutral-body">Ready to process requests</p>
                         </div>
                     </div>
                 </div>
+
+                <!-- Settings View -->
+                <div id="view-settings" class="w-full max-w-lg hidden transition-all duration-300">
+                    <div class="mb-12 text-center">
+                        <h2 data-i18n="settings_title" class="text-3xl font-bold tracking-tight text-neutral-title mb-4">Configuration</h2>
+                        <p data-i18n="settings_desc" class="text-sm text-neutral-body leading-relaxed max-w-sm mx-auto">
+                            Manage your security preferences and interface options.
+                        </p>
+                    </div>
+
+                    <div class="bg-neutral-surface border border-neutral-border rounded-xl p-10 space-y-8 shadow-2xl">
+                        <!-- Encryption Algorithm selection -->
+                        <div class="space-y-3">
+                            <label data-i18n="label_algorithm"
+                                class="text-[10px] uppercase tracking-[0.15em] font-bold text-neutral-body block">Encryption Algorithm</label>
+                                <select id="setting-algorithm" onchange="saveSettings()" class="w-full bg-neutral-surface border border-neutral-border rounded-lg px-3 py-2 text-sm text-neutral-title focus:ring-1 focus:ring-neutral-border focus:outline-none transition-all cursor-pointer">
+                                    <option value="aes-256-gcm">AES-256-GCM (Authentic)</option>
+                                    <option value="aes-256-cbc">AES-256-CBC (Classic)</option>
+                                </select>
+                        </div>
+
+                        <!-- Language Selection -->
+                        <div class="space-y-3">
+                            <label data-i18n="label_language"
+                                class="text-[10px] uppercase tracking-[0.15em] font-bold text-neutral-body block">Application Language</label>
+                            <select id="setting-language" onchange="applyLanguageSetting()"
+                                    class="w-full bg-neutral-dark border border-neutral-border rounded-lg px-4 py-3 text-sm text-neutral-title focus:border-neutral-body/50 transition-colors focus:outline-none appearance-none cursor-pointer">
+                                <option value="en">English (US)</option>
+                                <option value="es">Español (ES)</option>
+                            </select>
+                        </div>
+
+                        <div class="pt-4 border-t border-neutral-border/30">
+                            <p data-i18n="settings_note" class="text-[10px] text-neutral-body italic leading-relaxed">
+                                Settings are saved automatically and applied to future operations.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Archive View -->
+                <div id="view-archive" class="w-full max-w-2xl hidden transition-all duration-300">
+                    <div class="mb-12 text-center">
+                        <h2 data-i18n="archive_title" class="text-3xl font-bold tracking-tight text-neutral-title mb-4">Archive</h2>
+                        <p data-i18n="archive_desc" class="text-sm text-neutral-body leading-relaxed max-w-sm mx-auto">
+                            History of your recent secure operations.
+                        </p>
+                    </div>
+
+                    <div class="bg-neutral-surface border border-neutral-border rounded-xl p-6 shadow-2xl flex flex-col h-[400px]">
+                        <div class="flex justify-between items-center mb-6 px-4">
+                            <h3 class="text-[10px] uppercase tracking-[0.15em] font-bold text-neutral-body">Recent Activity</h3>
+                            <button onclick="clearHistory()" class="text-[10px] uppercase tracking-widest font-bold text-red-500/80 hover:text-red-400 transition-colors flex items-center">
+                                <i data-lucide="trash-2" class="w-3 h-3 mr-1.5"></i>
+                                <span data-i18n="archive_clear">Clear History</span>
+                            </button>
+                        </div>
+
+                        <div id="history-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 px-2">
+                            <!-- History items will be injected here -->
+                            <div id="history-empty" class="h-full flex flex-col items-center justify-center opacity-20">
+                                <i data-lucide="inbox" class="w-12 h-12 mb-4"></i>
+                                <p data-i18n="archive_empty" class="text-xs uppercase tracking-widest font-medium">No history available</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
 

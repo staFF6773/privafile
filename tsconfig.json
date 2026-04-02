@@ -9,6 +9,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "moduleResolution": "node10",
+    "resolveJsonModule": true,
     "ignoreDeprecations": "6.0"
   },
   "include": [
